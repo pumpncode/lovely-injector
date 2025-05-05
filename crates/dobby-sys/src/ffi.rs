@@ -42,6 +42,13 @@ extern "C" {
     ) -> MemoryOperationError;
 }
 extern "C" {
+    pub fn DobbyCodePatch(
+        address: *mut ::std::os::raw::c_void,
+        buffer: *mut ::std::os::raw::c_uchar,
+        buffer_size: ::std::os::raw::c_uint,
+    ) -> ::std::os::raw::c_int;
+}
+extern "C" {
     pub fn log_set_level(level: ::std::os::raw::c_int);
 }
 extern "C" {

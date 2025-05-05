@@ -11,19 +11,33 @@ void *DobbySymbolResolver(const char *image_name, const char *symbol_name);
 
 // global offset table
 int DobbyGlobalOffsetTableReplace(char *image_name, char *symbol_name,
-                                  void *fake_func, void **orig_func);
+								  void *fake_func, void **orig_func);
 
-typedef enum {
-  kMemoryOperationSuccess,
-  kMemoryOperationError,
-  kNotSupportAllocateExecutableMemory,
-  kNotEnough,
-  kNone
+typedef enum
+{
+	kMemoryOperationSuccess,
+	kMemoryOperationError,
+	kNotSupportAllocateExecutableMemory,
+	kNotEnough,
+	kNone
 } MemoryOperationError;
 
-MemoryOperationError CodePatch(void *address, unsigned char *buffer,
-                               unsigned int buffer_size);
+#include <stdint.h>
 
-void log_set_level(int level);
-void log_switch_to_syslog();
-void log_switch_to_file(const char *path);
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+	MemoryOperationError CodePatch(void *address, unsigned char *buffer,
+								   unsigned int buffer_size);
+
+	int DobbyCodePatch(void *address, uint8_t *buffer, uint32_t buffer_size);
+
+	void log_set_level(int level);
+	void log_switch_to_syslog();
+	void log_switch_to_file(const char *path);
+
+#ifdef __cplusplus
+}
+#endif

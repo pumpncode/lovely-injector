@@ -15,7 +15,7 @@ use log::*;
 use crop::Rope;
 use getargs::{Arg, Options};
 use itertools::Itertools;
-use patch::{pattern, regex, Patch, PatchFile, Priority};
+use patch::{Patch, PatchFile, Priority};
 use regex_lite::Regex;
 use sha2::{Digest, Sha256};
 use sys::{LuaLib, LuaState, LUA};
@@ -42,7 +42,8 @@ pub struct Lovely {
 impl Lovely {
     /// Initialize the Lovely patch runtime.
     pub fn init(loadbuffer: &'static LoadBuffer, lualib: LuaLib, dump_all: bool) -> Self {
-        LUA.set(lualib).unwrap_or_else(|_| panic!("LUA static var has already been set."));
+        LUA.set(lualib)
+            .unwrap_or_else(|_| panic!("LUA static var has already been set."));
 
         let start = Instant::now();
 
@@ -264,16 +265,8 @@ impl PatchTable {
     /// - MOD_DIR/lovely/*.toml
     pub fn load(mod_dir: &Path) -> PatchTable {
         fn filename_cmp(first: &PathBuf, second: &PathBuf) -> Ordering {
-            let first = first
-                .file_name()
-                .unwrap()
-                .to_string_lossy()
-                .to_lowercase();
-            let second = second
-                .file_name()
-                .unwrap()
-                .to_string_lossy()
-                .to_lowercase();
+            let first = first.file_name().unwrap().to_string_lossy().to_lowercase();
+            let second = second.file_name().unwrap().to_string_lossy().to_lowercase();
             first.cmp(&second)
         }
 
@@ -483,10 +476,11 @@ impl PatchTable {
             .patches
             .iter()
             .filter(|(patch, _, _)| matches!(patch, Patch::Pattern(..)))
-            .chain(self
-                .patches
-                .iter()
-                .filter(|(patch, _, _)| matches!(patch, Patch::Regex(..))))
+            .chain(
+                self.patches
+                    .iter()
+                    .filter(|(patch, _, _)| matches!(patch, Patch::Regex(..))),
+            )
             .sorted_by_key(|(_, prio, _)| prio)
             .map(|(patch, _, path)| (patch, path))
             .collect_vec();
@@ -516,7 +510,7 @@ impl PatchTable {
             let result = match patch {
                 Patch::Pattern(x) => x.apply(target, &mut rope, path),
                 Patch::Regex(x) => x.apply(target, &mut rope, path),
-                _ => unreachable!()
+                _ => unreachable!(),
             };
 
             if result {

@@ -1,8 +1,15 @@
 use lovely_core::log::*;
 use lovely_core::sys::{LuaState, LUA_LIB};
-use std::{env, ffi::c_void, mem, panic, sync::{LazyLock, OnceLock}};
+use std::{
+    env,
+    ffi::c_void,
+    mem, panic,
+    sync::{LazyLock, OnceLock},
+};
 
 use lovely_core::Lovely;
+
+mod lualib;
 
 static RUNTIME: OnceLock<Lovely> = OnceLock::new();
 
@@ -56,7 +63,11 @@ unsafe fn construct() {
     let args: Vec<_> = env::args().collect();
     let dump_all = args.contains(&"--dump-all".to_string());
 
-    let rt = Lovely::init(&|a, b, c, d, e| RECALL(a, b, c, d, e), dump_all);
+    let rt = Lovely::init(
+        &|a, b, c, d, e| RECALL(a, b, c, d, e),
+        lualib::get_lualib(),
+        dump_all,
+    );
     RUNTIME
         .set(rt)
         .unwrap_or_else(|_| panic!("Failed to instantiate runtime."));
